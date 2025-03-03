@@ -60,7 +60,7 @@ class ProxyInterface:
     def __init__(
         self,
         countries: list[str] = [],
-        protocol: Literal["https", "http"] = "http",
+        protocol: Literal["https", "http", "socks5"] = "http",
         maxProxies: int = 10,
         autoRotate: bool = False,
         autoUpdate: bool = True,
@@ -85,7 +85,7 @@ class ProxyInterface:
 
         self.countries: list[str] = [i.upper() for i in countries]
 
-        if protocol not in ["https", "http"]:
+        if protocol not in ["https", "http", "socks5"]:
             raise UnsupportedProxyProtocol(
                 f"Protocol {protocol} is not supported by swiftshadow, please choose between HTTP or HTTPS"
             )

@@ -9,17 +9,17 @@ from swiftshadow.models import Proxy
 
 
 def test_basic_proxy():
-    swift = ProxyInterface(debug=True)
+    swift = ProxyInterface(debug=True, protocol="socks5")
     assert isinstance(swift.get(), Proxy)
 
 
 def test_proxy_country_filter():
-    swift = ProxyInterface(countries=["US"], debug=True)
+    swift = ProxyInterface(countries=["US"], debug=True, protocol="socks5")
     assert isinstance(swift.get(), Proxy)
 
 
 def test_proxy_rotation():
-    swift = ProxyInterface(debug=True)
+    swift = ProxyInterface(debug=True, protocol="socks5")
     first = swift.get()
     swift.rotate()
     second = swift.get()

@@ -10,7 +10,7 @@ from swiftshadow.validator import validate_proxies
 
 async def Monosans(
     countries: list[str] = [],
-    protocol: Literal["http", "https"] = "http",
+    protocol: Literal["http", "https", "socks5"] = "http",
 ) -> list[Proxy]:
     response = get(
         "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies.json"
@@ -36,20 +36,20 @@ async def Monosans(
 
 
 async def Thespeedx(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     raw: str = get(
-        "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt"
+        f"https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/{protocol}.txt"
     ).text
-    proxies: list[Proxy] = plaintextToProxies(raw, protocol="http")
+    proxies: list[Proxy] = plaintextToProxies(raw, protocol=protocol)
     results = await validate_proxies(proxies)
     return results
 
 
 async def ProxyScrape(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
-    baseUrl = "https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol=http&proxy_format=ipport&format=json"
+    baseUrl = f"https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&protocol={protocol}&proxy_format=ipport&format=json"
     proxies: list[Proxy] = []
     if len(countries) == 0:
         apiUrl = baseUrl + "&country=all"
@@ -57,14 +57,14 @@ async def ProxyScrape(
         apiUrl = baseUrl + "&country=" + ",".join([i.upper() for i in countries])
     raw = get(apiUrl).json()
     for ipRaw in raw["proxies"]:
-        proxy = Proxy(protocol="http", ip=ipRaw["ip"], port=ipRaw["port"])
+        proxy = Proxy(protocol=protocol, ip=ipRaw["ip"], port=ipRaw["port"])
         proxies.append(proxy)
     results = await validate_proxies(proxies)
     return results
 
 
 async def GoodProxy(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     baseUrl = "https://raw.githubusercontent.com/yuceltoluyag/GoodProxy/refs/heads/main/GoodProxy.txt"
     proxies: list[Proxy] = []
@@ -74,34 +74,34 @@ async def GoodProxy(
         if line == "":
             continue
         line = line.split("|")[0].split(":")
-        proxy = Proxy(ip=line[0], port=int(line[1]), protocol="http")
+        proxy = Proxy(ip=line[0], port=int(line[1]), protocol=protocol)
         proxies.append(proxy)
     results = await validate_proxies(proxies)
     return results
 
 
 async def OpenProxyList(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
-    raw = get("https://api.openproxylist.xyz/http.txt").text
-    proxies: list[Proxy] = plaintextToProxies(raw, protocol="http")
+    raw = get(f"https://api.openproxylist.xyz/{protocol}.txt").text
+    proxies: list[Proxy] = plaintextToProxies(raw, protocol=protocol)
     results = await validate_proxies(proxies)
     return results
 
 
 async def MuRongPIG(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     raw = get(
-        "https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/refs/heads/main/http_checked.txt"
+        f"https://raw.githubusercontent.com/MuRongPIG/Proxy-Master/refs/heads/main/{protocol}_checked.txt"
     ).text
-    proxies: list[Proxy] = plaintextToProxies(raw, protocol="http")
+    proxies: list[Proxy] = plaintextToProxies(raw, protocol=protocol)
     results = await validate_proxies(proxies)
     return results
 
 
 async def KangProxy(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     raw = get(
         f"https://github.com/officialputuid/KangProxy/raw/refs/heads/KangProxy/{protocol}/{protocol}.txt"
@@ -112,7 +112,7 @@ async def KangProxy(
 
 
 async def Mmpx12(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     raw = get(
         f"https://github.com/mmpx12/proxy-list/raw/refs/heads/master/{protocol}.txt"
@@ -123,7 +123,7 @@ async def Mmpx12(
 
 
 async def Anonym0usWork1221(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
     raw = get(
         f"https://github.com/Anonym0usWork1221/Free-Proxies/raw/refs/heads/main/proxy_files/{protocol}_proxies.txt"
@@ -134,29 +134,51 @@ async def Anonym0usWork1221(
 
 
 async def ProxySpace(
-    countries: list[str] = [], protocol: Literal["http", "https"] = "http"
+    countries: list[str] = [], protocol: Literal["http", "https", "socks5"] = "http"
 ):
-    raw = get("https://proxyspace.pro/http.txt").text
-    proxies: list[Proxy] = plaintextToProxies(raw, protocol="http")
+    raw = get(f"https://proxyspace.pro/{protocol}.txt").text
+    proxies: list[Proxy] = plaintextToProxies(raw, protocol=protocol)
     results = await validate_proxies(proxies)
     return results
 
 
 Providers: list[Provider] = [
-    Provider(providerFunction=ProxyScrape, countryFilter=True, protocols=["http"]),
-    Provider(providerFunction=Monosans, countryFilter=True, protocols=["http"]),
-    Provider(providerFunction=MuRongPIG, countryFilter=False, protocols=["http"]),
-    Provider(providerFunction=Thespeedx, countryFilter=False, protocols=["http"]),
+    Provider(
+        providerFunction=ProxyScrape, countryFilter=True, protocols=["http", "socks5"]
+    ),
+    Provider(
+        providerFunction=Monosans, countryFilter=True, protocols=["http", "socks5"]
+    ),
+    Provider(
+        providerFunction=MuRongPIG, countryFilter=False, protocols=["http", "socks5"]
+    ),
+    Provider(
+        providerFunction=Thespeedx, countryFilter=False, protocols=["http", "socks5"]
+    ),
     Provider(
         providerFunction=Anonym0usWork1221,
         countryFilter=False,
-        protocols=["http", "https"],
+        protocols=["http", "https", "socks5"],
     ),
-    Provider(providerFunction=Mmpx12, countryFilter=False, protocols=["http", "https"]),
-    Provider(providerFunction=GoodProxy, countryFilter=False, protocols=["http"]),
     Provider(
-        providerFunction=KangProxy, countryFilter=False, protocols=["http", "https"]
+        providerFunction=Mmpx12,
+        countryFilter=False,
+        protocols=["http", "https", "socks5"],
     ),
-    Provider(providerFunction=ProxySpace, countryFilter=False, protocols=["http"]),
-    Provider(providerFunction=OpenProxyList, countryFilter=False, protocols=["http"]),
+    Provider(
+        providerFunction=GoodProxy, countryFilter=False, protocols=["http", "socks5"]
+    ),
+    Provider(
+        providerFunction=KangProxy,
+        countryFilter=False,
+        protocols=["http", "https", "socks5"],
+    ),
+    Provider(
+        providerFunction=ProxySpace, countryFilter=False, protocols=["http", "socks5"]
+    ),
+    Provider(
+        providerFunction=OpenProxyList,
+        countryFilter=False,
+        protocols=["http", "socks5"],
+    ),
 ]

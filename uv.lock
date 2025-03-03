@@ -1,4 +1,5 @@
 version = 1
+revision = 1
 requires-python = ">=3.12"
 
 [[package]]
@@ -64,6 +65,19 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/79/c1/756a7e65aa087c7fac724d6c4c038f2faaa2a42fe56dbc1dd62a33ca7213/aiohttp-3.11.11-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:bf8d9bfee991d8acc72d060d53860f356e07a50f0e0d09a8dfedea1c554dd0d5", size = 1672783 },
     { url = "https://files.pythonhosted.org/packages/73/ba/a6190ebb02176c7f75e6308da31f5d49f6477b651a3dcfaaaca865a298e2/aiohttp-3.11.11-cp313-cp313-win32.whl", hash = "sha256:9d73ee3725b7a737ad86c2eac5c57a4a97793d9f442599bea5ec67ac9f4bdc3d", size = 410229 },
     { url = "https://files.pythonhosted.org/packages/b8/62/c9fa5bafe03186a0e4699150a7fed9b1e73240996d0d2f0e5f70f3fdf471/aiohttp-3.11.11-cp313-cp313-win_amd64.whl", hash = "sha256:c7a06301c2fb096bdb0bd25fe2011531c1453b9f2c163c8031600ec73af1cc99", size = 436081 },
+]
+
+[[package]]
+name = "aiohttp-socks"
+version = "0.10.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiohttp" },
+    { name = "python-socks" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/25/c0/dfc948c2aff58db2846192d744dc889bd634b9f3cc7d0fca85ef3c7e9cd4/aiohttp_socks-0.10.1.tar.gz", hash = "sha256:49f2e1f8051f2885719beb1b77e312b5a27c3e4b60f0b045a388f194d995e068", size = 10445 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d3/04/7ff144f7465e83cf87459ffd74688871918496acd4816507cca1af5623d3/aiohttp_socks-0.10.1-py3-none-any.whl", hash = "sha256:6fd4d46c09f952f971a011ff446170daab8d539cf5310c0627f8423df2fb15ea", size = 10119 },
 ]
 
 [[package]]
@@ -670,6 +684,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-socks"
+version = "2.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/db/56/a21c65c9968fbdb442b177a4f6f42d150c4bc66c179606193ee86e5b5dc5/python_socks-2.7.1.tar.gz", hash = "sha256:f1a0bb603830fe81e332442eada96757b8f8dec02bd22d1d6f5c99a79704c550", size = 230371 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/59/a5/8bc495f162f6ff6a805a0bd558312db2cc8d6aa6279324ba8180af64f777/python_socks-2.7.1-py3-none-any.whl", hash = "sha256:2603c6454eeaeb82b464ad705be188989e8cf1a4a16f0af3c921d6dd71a49cec", size = 54980 },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -796,11 +819,12 @@ wheels = [
 
 [[package]]
 name = "swiftshadow"
-version = "2.0.1"
+version = "2.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "aiofiles" },
     { name = "aiohttp" },
+    { name = "aiohttp-socks" },
     { name = "appdirs" },
     { name = "requests" },
 ]
@@ -820,6 +844,7 @@ dev = [
 requires-dist = [
     { name = "aiofiles", specifier = ">=24.1.0" },
     { name = "aiohttp", specifier = ">=3.11.11" },
+    { name = "aiohttp-socks", specifier = ">=0.10.1" },
     { name = "appdirs", specifier = ">=1.4.4" },
     { name = "requests", specifier = ">=2.32.3" },
 ]

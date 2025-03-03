@@ -2,6 +2,7 @@ import asyncio
 import re
 
 import aiohttp
+from aiohttp_socks import ProxyConnector
 
 from swiftshadow.models import Proxy
 
@@ -36,7 +37,7 @@ async def get_host_ip(async_session: aiohttp.ClientSession) -> str | None:
     Returns:
         text: Host IP
     """
-    async with async_session.get("http://checkip.amazonaws.com") as response:
+    async with async_session.get("https://ifconfig.me") as response:
         text = await response.text()
         ip = find_ipv4_in_string(text)
         return ip
@@ -44,7 +45,7 @@ async def get_host_ip(async_session: aiohttp.ClientSession) -> str | None:
 
 async def check_proxy(async_session: aiohttp.ClientSession, proxy: Proxy) -> str:
     """
-    Check one proxy abject.
+    Check one proxy object.
 
     Args:
         async_session: aiohttp client session object
@@ -53,13 +54,26 @@ async def check_proxy(async_session: aiohttp.ClientSession, proxy: Proxy) -> str
     Returns:
         text: API response text
     """
-    async with async_session.get(
-        url=f"{proxy.protocol}://checkip.amazonaws.com",
-        proxy=proxy.as_string(),
-        timeout=4,
-    ) as response:
-        text = await response.text()
-        return text
+    proxy_url = proxy.as_string()
+    if proxy_url.startswith('socks'):
+        # 使用 aiohttp_socks 处理 SOCKS 代理
+        connector = ProxyConnector.from_url(proxy_url)
+        async with aiohttp.ClientSession(connector=connector) as session:
+            async with session.get(
+                url="https://google.com",
+                timeout=4,
+            ) as response:
+                text = await response.text()
+                return text
+    else:
+        # 原有的 HTTP/HTTPS 代理处理逻辑
+        async with async_session.get(
+            url="https://google.com",
+            proxy=proxy_url,
+            timeout=4,
+        ) as response:
+            text = await response.text()
+            return text
 
 
 async def validate_proxies(proxies: list[Proxy]) -> list[Proxy]:

@@ -16,10 +16,10 @@ class Proxy:
     """
 
     ip: str
-    protocol: Literal["http", "https"]
+    protocol: Literal["http", "https", "socks5"]
     port: int
 
-    def as_requests_dict(self) -> dict[Literal["http", "https"], str]:
+    def as_requests_dict(self) -> dict[Literal["http", "https", "socks5"], str]:
         """
         Return proxy in requests commpatible dict format.
 
@@ -65,7 +65,7 @@ class Provider:
     """
 
     providerFunction: Callable[
-        [list[str], Literal["http", "https"]], Coroutine[Any, Any, list[Proxy]]
+        [list[str], Literal["http", "https", "socks5"]], Coroutine[Any, Any, list[Proxy]]
     ]
     countryFilter: bool
-    protocols: list[Literal["http", "https"]]
+    protocols: list[Literal["http", "https", "socks5"]]
