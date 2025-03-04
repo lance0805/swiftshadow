@@ -13,6 +13,7 @@ from swiftshadow.exceptions import UnsupportedProxyProtocol
 from swiftshadow.providers import Providers
 from asyncio import run
 import aiofiles
+import random
 
 
 logger = getLogger("swiftshadow")
@@ -153,21 +154,27 @@ class ProxyInterface:
 
         self.proxies = []
 
-        for provider in Providers:
-            if self.protocol not in provider.protocols:
-                continue
-            if (len(self.countries) != 0) and (not provider.countryFilter):
-                continue
-            providerProxies: list[Proxy] = await provider.providerFunction(
+        available_providers = [
+            provider for provider in Providers 
+            if self.protocol in provider.protocols 
+            and (len(self.countries) == 0 or provider.countryFilter)
+        ]
+        
+        while len(self.proxies) < self.maxproxies and available_providers:
+            provider_index = random.randint(0, len(available_providers) - 1)
+            current_provider = available_providers[provider_index]
+            
+            providerProxies: list[Proxy] = await current_provider.providerFunction(
                 self.countries, self.protocol
             )
-            logger.debug(
-                f"{len(providerProxies)} proxies from {provider.providerFunction.__name__}"
-            )
-            self.proxies.extend(providerProxies)
-
-            if len(self.proxies) >= self.maxproxies:
-                break
+            
+            if providerProxies:
+                self.proxies.extend(providerProxies)
+                logger.debug(
+                    f"{len(providerProxies)} proxies from {current_provider.providerFunction.__name__}"
+                )
+            else:
+                available_providers.pop(provider_index)
 
         if len(self.proxies) == 0:
             raise ValueError("No proxies where found for the current filter settings.")
@@ -216,21 +223,27 @@ class ProxyInterface:
 
         self.proxies = []
 
-        for provider in Providers:
-            if self.protocol not in provider.protocols:
-                continue
-            if (len(self.countries) != 0) and (not provider.countryFilter):
-                continue
+        available_providers = [
+            provider for provider in Providers 
+            if self.protocol in provider.protocols 
+            and (len(self.countries) == 0 or provider.countryFilter)
+        ]
+        
+        while len(self.proxies) < self.maxproxies and available_providers:
+            provider_index = random.randint(0, len(available_providers) - 1)
+            current_provider = available_providers[provider_index]
+            
             providerProxies: list[Proxy] = run(
-                provider.providerFunction(self.countries, self.protocol)
+                current_provider.providerFunction(self.countries, self.protocol)
             )
-            logger.debug(
-                f"{len(providerProxies)} proxies from {provider.providerFunction.__name__}"
-            )
-            self.proxies.extend(providerProxies)
-
-            if len(self.proxies) >= self.maxproxies:
-                break
+            
+            if providerProxies:
+                self.proxies.extend(providerProxies)
+                logger.debug(
+                    f"{len(providerProxies)} proxies from {current_provider.providerFunction.__name__}"
+                )
+            else:
+                available_providers.pop(provider_index)
 
         if len(self.proxies) == 0:
             raise ValueError("No proxies where found for the current filter settings.")
